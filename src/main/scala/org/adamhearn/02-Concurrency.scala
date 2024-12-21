@@ -26,10 +26,11 @@ object `02_Async` extends KyoSpecDefault {
         *   - Delay for 50.millis
         *   - Return the input multiplied by 2
         */
-      def computation(i: Int): Int < Async = ???
+      def computation(i: Int): Int < Async =
+        Async.delay(50.millis)(i * 2)
 
       computation(21).map(result => assertTrue(result == 42))
-    } @@ ignore,
+    },
     test("parallel") {
 
       /** Exercise: Async.parallel
@@ -43,12 +44,20 @@ object `02_Async` extends KyoSpecDefault {
         *   - Fail with Abort if the input is negative
         *   - Use a 100.millis delay
         */
-      def computation(i: Int): Int < (Async & Abort[String]) = ???
+      def computation(i: Int): Int < (Async & Abort[String]) =
+        Async.delay(100.millis):
+          if i < 0 then Abort.fail("negative")
+          else i * 2
 
-      lazy val parallel: (Int, Int, Int) < (Abort[String] & Async) = ???
+      lazy val combined: (Int, Int, Int) < (Abort[String] & Async) =
+        Async.parallel(
+          computation(1),
+          computation(2),
+          computation(3),
+        )
 
-      Abort.run(parallel).map(result => assertTrue(result == Success((2, 4, 6))))
-    } @@ ignore,
+      Abort.run(combined).map(result => assertTrue(result == Success((2, 4, 6))))
+    },
     test("race") {
 
       /** Exercise: Async.race
@@ -61,13 +70,21 @@ object `02_Async` extends KyoSpecDefault {
         *   - Fail with `Abort` if i is even
         *   - Return i if odd
         */
-      def computation(i: Int): Int < (Async & Abort[String]) = ???
+      def computation(i: Int): Int < (Async & Abort[String]) =
+        Async.delay(50.millis * i):
+          if i % 2 == 0 then Abort.fail("even")
+          else i
 
-      lazy val race: Int < (Abort[String] & Async) = ???
+      val racing: Int < (Abort[String] & Async) =
+        Async.race(
+          computation(3),
+          computation(5),
+          computation(7),
+        )
 
       // note: `kyo-test` currently doesn't support `Abort[String]`, so we handle it directly
-      Abort.run(race).map(result => assertTrue(result == Success(3)))
-    } @@ ignore,
+      Abort.run(racing).map(result => assertTrue(result == Success(3)))
+    },
     test("timeout") {
 
       /** Exercise: Async.timeout
@@ -80,10 +97,12 @@ object `02_Async` extends KyoSpecDefault {
         *   - Has a timeout of 50 milliseconds
         *   - Should result in a Timeout error
         */
-      lazy val computation: Int < (Abort[Timeout] & Async) = ???
+      val computation: Int < (Abort[Timeout] & Async) =
+        val slow = Async.delay(100.millis)(42)
+        Async.timeout(50.millis)(slow)
 
       Abort.run(computation).map(result => assertTrue(result.isFail))
-    } @@ ignore,
+    },
     test("run") {
 
       /** Exercise: Async.run
@@ -101,15 +120,18 @@ object `02_Async` extends KyoSpecDefault {
         *   - Return input * 2 if positive
         *   - Fork the computation with Async.run
         */
-      def computation(i: Int): Fiber[String, Int] < IO = ???
+      def computation(i: Int): Fiber[String, Int] < IO =
+        val async = Async.delay(50.millis):
+          if i < 0 then Abort.fail("negative not allowed")
+          else i * 2
+        Async.run(async)
 
       // `fiber#get` awaits the result, translating the `Fiber` error channel back to `Abort `
       // Note how Fiber's `E` channel is translated to/from Abort.
-      lazy val async = computation(21).map(_.get)
       Abort
-        .run(async)
+        .run(computation(21).map(_.get))
         .map(result => assertTrue(result == Success(42)))
-    } @@ ignore,
+    },
     test("interruption") {
 
       /** Exercise: Fiber Interruption
@@ -122,10 +144,15 @@ object `02_Async` extends KyoSpecDefault {
         *   - Interrupt it immediatelly
         *   - Return the result via fiber.get
         */
-      lazy val computation: Int < Async = ???
+      lazy val computation: Int < Async =
+        for
+          fiber  <- Async.run(Async.delay(100.millis)(42))
+          _      <- fiber.interrupt
+          result <- fiber.get
+        yield result
 
       Abort.run(computation).map(result => assertTrue(result.isPanic))
-    } @@ ignore,
+    },
   )
 }
 
@@ -145,10 +172,14 @@ object `02_Structures` extends KyoSpecDefault {
             *   - Updates it by adding 1
             *   - Returns the new value
             */
-          lazy val computation: Int < IO = ???
+          lazy val computation: Int < IO =
+            for
+              ref    <- AtomicRef.init(0)
+              result <- ref.updateAndGet(_ + 1)
+            yield result
 
           computation.map(v => assertTrue(v == 1))
-        } @@ ignore
+        }
       ),
       suite("Queue")(
         test("bounded") {
@@ -165,7 +196,15 @@ object `02_Structures` extends KyoSpecDefault {
             *   - Taking an element
             *   - Verifying it's no longer full
             */
-          lazy val computation: (Boolean, Maybe[Int], Boolean) < (IO & Abort[Closed]) = ???
+          lazy val computation: (Boolean, Maybe[Int], Boolean) < (IO & Abort[Closed]) =
+            for
+              queue     <- Queue.init[Int](2)
+              _         <- queue.offer(1)
+              _         <- queue.offer(2)
+              full      <- queue.full
+              first     <- queue.poll
+              afterPoll <- queue.full
+            yield (full, first, afterPoll)
 
           computation.map((full, first, afterPoll) =>
             assertTrue(
@@ -174,7 +213,7 @@ object `02_Structures` extends KyoSpecDefault {
                 !afterPoll
             )
           )
-        } @@ ignore
+        }
       ),
     )
 }
