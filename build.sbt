@@ -1,6 +1,6 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val kyoVersion = "0.14.0"
+val kyoVersion = "0.15.1"
 
 lazy val root = project
   .in(file("."))
@@ -28,7 +28,7 @@ lazy val root = project
       "io.getkyo"     %% "kyo-zio"         % kyoVersion,
       "io.getkyo"     %% "kyo-test"        % kyoVersion,
       "org.jline"      % "jline"           % "3.24.1",
-      "ch.qos.logback" % "logback-classic" % "1.5.3",
+      "ch.qos.logback" % "logback-classic" % "1.5.14",
     ),
     run / fork        := true,
     scalafmtOnCompile := true,
