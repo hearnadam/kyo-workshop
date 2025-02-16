@@ -5,8 +5,8 @@ import sttp.tapir.*
 import sttp.tapir.server.netty.*
 
 object Main extends KyoApp:
-  def app = defer:
-    val port = await(System.property[Int]("PORT", 80))
+  val app = defer:
+    val port = System.property[Int]("PORT", 80).now
     val options = NettyKyoServerOptions
       .default(enableLogging = false)
       .forkExecution(false)
@@ -18,13 +18,15 @@ object Main extends KyoApp:
       NettyKyoServer(options, config)
         .host("0.0.0.0")
         .port(port)
-    await(Console.println(s"Starting... 0.0.0.0:$port"))
-    await(Routes.run(server):
-      Routes.add(
-        _.get
-          .in("echo" / path[String])
-          .out(stringBody)
-      )(input => input)
-    )
+    Console.printLine(s"Starting... 0.0.0.0:$port").now
+    Routes
+      .run(server)(
+        Routes.add(
+          _.get
+            .in("echo" / path[String])
+            .out(stringBody)
+        )(input => input)
+      )
+      .now
 
   run(app)

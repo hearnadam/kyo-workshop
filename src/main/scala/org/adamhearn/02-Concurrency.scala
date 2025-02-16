@@ -101,7 +101,7 @@ object `02_Async` extends KyoSpecDefault {
         val slow = Async.delay(100.millis)(42)
         Async.timeout(50.millis)(slow)
 
-      Abort.run(computation).map(result => assertTrue(result.isFail))
+      Abort.run(computation).map(result => assertTrue(result.isFailure))
     },
     test("run") {
 

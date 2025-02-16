@@ -114,10 +114,10 @@ object `00_Result` extends KyoSpecDefault:
 
         lazy val fail: Result[TrackedError, Nothing] = Result.fail(TrackedError())
         lazy val panic: Result[Nothing, Nothing]     = Result.panic(UntrackedError())
-        lazy val success: Result[Nothing, Int]       = Result.success(42)
+        lazy val success: Result[Nothing, Int]       = Result.succeed(42)
 
-        assertTrue(fail.resurrect.isFail) &&
-        assertTrue(panic.resurrect.isFail) &&
+        assertTrue(fail.resurrect.isFailure) &&
+        assertTrue(panic.resurrect.isFailure) &&
         assertTrue(success.resurrect.isSuccess)
       },
       test("error handling") {
@@ -140,7 +140,7 @@ object `00_Result` extends KyoSpecDefault:
           if input.isEmpty then Result.fail(EmptyInput)
           else
             input.toIntOption match
-              case Some(id) => Result.success(id)
+              case Some(id) => Result.succeed(id)
               case None     => Result.fail(InvalidFormat)
 
         // If the user ID is `42`, succeed with "Approved"
@@ -148,7 +148,7 @@ object `00_Result` extends KyoSpecDefault:
         // Otherwise, fail with a Mismatch error
         def charge(id: Int): Result[ProcessingError, String] =
           id match
-            case 42 => Result.success("Approved")
+            case 42 => Result.succeed("Approved")
             case 1  => Result.fail(CreditCardDecline)
             case _  => Result.fail(Mismatch(id.toString, "42"))
 
@@ -158,10 +158,10 @@ object `00_Result` extends KyoSpecDefault:
         // use pattern matching to convert the result to a string
         def handle(result: Result[ValidationError | ProcessingError, String]): String =
           result match
-            case Result.Success(value)                  => value
-            case Result.Fail(CreditCardDecline)         => "Transaction Declined"
-            case Result.Fail(Mismatch(input, expected)) => s"Mismatch: $input <> $expected"
-            case Result.Panic(error)                    => throw error
+            case Result.Success(value)                     => value
+            case Result.Failure(CreditCardDecline)         => "Transaction Declined"
+            case Result.Failure(Mismatch(input, expected)) => s"Mismatch: $input <> $expected"
+            case Result.Panic(error)                       => throw error
 
         assertTrue(handle(process("42")) == "Approved") &&
         assertTrue(handle(process("1")) == "Transaction Declined") &&
