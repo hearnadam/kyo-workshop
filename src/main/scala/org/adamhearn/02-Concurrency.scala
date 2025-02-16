@@ -82,7 +82,7 @@ object `02_Async` extends KyoSpecDefault {
         */
       lazy val computation: Int < (Abort[Timeout] & Async) = ???
 
-      Abort.run(computation).map(result => assertTrue(result.isFail))
+      Abort.run(computation).map(result => assertTrue(result.isFailure))
     } @@ ignore,
     test("run") {
 

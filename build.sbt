@@ -1,12 +1,12 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val kyoVersion = "0.15.1"
+val kyoVersion = "0.16.2"
 
 lazy val root = project
   .in(file("."))
   .settings(
     name         := "kyo-workshop",
-    scalaVersion := "3.5.2",
+    scalaVersion := "3.6.2",
     scalacOptions ++= Seq(
       "-encoding",
       "utf8",
@@ -26,7 +26,7 @@ lazy val root = project
       "io.getkyo"     %% "kyo-sttp"        % kyoVersion,
       "io.getkyo"     %% "kyo-tapir"       % kyoVersion,
       "io.getkyo"     %% "kyo-zio"         % kyoVersion,
-      "io.getkyo"     %% "kyo-test"        % kyoVersion,
+      "io.getkyo"     %% "kyo-zio-test"    % kyoVersion,
       "org.jline"      % "jline"           % "3.24.1",
       "ch.qos.logback" % "logback-classic" % "1.5.14",
     ),

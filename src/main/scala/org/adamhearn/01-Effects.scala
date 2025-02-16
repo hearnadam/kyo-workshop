@@ -34,7 +34,7 @@ object `01_Composition` extends KyoSpecDefault {
         for
           e <- Abort.run(even(42))
           o <- Abort.run(even(43))
-        yield assertTrue(e == Result.success(42)) &&
+        yield assertTrue(e == Result.succeed(42)) &&
           assertTrue(o == Result.fail("odd"))
       } @@ ignore,
       test("multiple") {
@@ -172,7 +172,7 @@ object `01_Effects` extends KyoSpecDefault {
           fs <- files.get.map(chunk => Kyo.foreach(chunk)(_.state))
         yield assertTrue(fs == Chunk(("one", true, 1), ("two", true, 0))) &&
           assertTrue(o.isSuccess) &&
-          assertTrue(t.isFail)
+          assertTrue(t.isFailure)
       } @@ ignore,
       test("Emit") {
 

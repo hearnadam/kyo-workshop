@@ -96,10 +96,10 @@ object `00_Result` extends KyoSpecDefault:
 
         lazy val fail: Result[TrackedError, Nothing] = Result.fail(TrackedError())
         lazy val panic: Result[Nothing, Nothing]     = Result.panic(UntrackedError())
-        lazy val success: Result[Nothing, Int]       = Result.success(42)
+        lazy val success: Result[Nothing, Int]       = Result.succeed(42)
 
-        assertTrue(fail.resurrect.isFail) &&
-        assertTrue(panic.resurrect.isFail) &&
+        assertTrue(fail.resurrect.isFailure) &&
+        assertTrue(panic.resurrect.isFailure) &&
         assertTrue(success.resurrect.isSuccess)
       } @@ ignore,
       test("error handling") {
@@ -122,7 +122,7 @@ object `00_Result` extends KyoSpecDefault:
           if input.isEmpty then Result.fail(EmptyInput)
           else
             input.toIntOption match
-              case Some(id) => Result.success(id)
+              case Some(id) => Result.succeed(id)
               case None     => Result.fail(InvalidFormat)
 
         // If the user ID is `42`, succeed with "Approved"
