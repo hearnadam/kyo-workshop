@@ -1,6 +1,6 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val kyoVersion = "0.16.2"
+val kyoVersion = "0.18.0"
 
 lazy val root = project
   .in(file("."))

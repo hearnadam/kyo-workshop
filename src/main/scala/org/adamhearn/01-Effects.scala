@@ -152,7 +152,7 @@ object `01_Effects` extends KyoSpecDefault {
               closed <- AtomicBoolean.init(false)
               reads  <- AtomicInt.init
               file = File(path, closed, reads)
-              _ <- files.update(_.append(file)) // for testing
+              _ <- files.updateAndGet(_.append(file)) // for testing
             yield file
 
         // define a function to open a file, acquiring and releasing a resource.
