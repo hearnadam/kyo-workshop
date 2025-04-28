@@ -63,16 +63,16 @@ object `03_Streams` extends KyoSpecDefault {
       lazy val run: Chunk[Int] < Any = stream.run
 
       // runFold: collect a List of the results, reversing the order of the values.
-      lazy val runFold: List[Int] < Any = stream.runFold(List.empty[Int])((a, b) => b :: a)
+      lazy val runFold: List[Int] < Any = stream.fold(List.empty[Int])((a, b) => b :: a)
 
       // runDiscard: run the Stream, not for the Result but for the Effects
       // Update a `Var`, summing the values of the Stream
-      lazy val runDiscard: Unit < Var[Int] = stream.map(i => Var.update[Int](_ + i)).runDiscard
+      lazy val runDiscard: Unit < Var[Int] = stream.map(i => Var.update[Int](_ + i)).discard
 
       // runForeach: run the Stream, applying the effect to each element
       // Use `Console.print` to print each element
       lazy val runForeach: Unit < (Abort[java.io.IOException] & IO) =
-        stream.runForeach(Console.print)
+        stream.foreach(Console.print)
 
       assertTrue(run.eval == Chunk(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) &&
       assertTrue(runFold.eval == List(10, 9, 8, 7, 6, 5, 4, 3, 2, 1)) &&

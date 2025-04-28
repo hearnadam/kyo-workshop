@@ -109,7 +109,7 @@ object `01_Effects` extends KyoSpecDefault {
         lazy val singleProvided: Int < Any = Env.run(24)(single)
 
         // there are multiple possible ways to provide more than one value:
-        lazy val multipleProvided: String < Any = Env.runTypeMap(TypeMap(true, "hello"))(multiple)
+        lazy val multipleProvided: String < Any = Env.runAll(TypeMap(true, "hello"))(multiple)
         lazy val _: String < Any                = Env.run(true)(Env.run("hello")(multiple))
 
         for
@@ -173,7 +173,7 @@ object `01_Effects` extends KyoSpecDefault {
               closed <- AtomicBoolean.init(false)
               reads  <- AtomicInt.init
               file = File(path, closed, reads)
-              _ <- files.update(_.append(file)) // for testing
+              _ <- files.updateAndGet(_.append(file)) // for testing
             yield file
 
         def open(path: String): File < (IO & Resource) =

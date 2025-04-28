@@ -50,7 +50,7 @@ object `02_Async` extends KyoSpecDefault {
           else i * 2
 
       lazy val combined: (Int, Int, Int) < (Abort[String] & Async) =
-        Async.parallel(
+        Async.zip(
           computation(1),
           computation(2),
           computation(3),
