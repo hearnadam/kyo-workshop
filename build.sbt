@@ -1,12 +1,12 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val kyoVersion = "0.18.0"
+val kyoVersion = "1.0-RC1"
 
 lazy val root = project
   .in(file("."))
   .settings(
     name         := "kyo-workshop",
-    scalaVersion := "3.6.2",
+    scalaVersion := "3.7.1",
     scalacOptions ++= Seq(
       "-encoding",
       "utf8",
@@ -27,12 +27,10 @@ lazy val root = project
       "io.getkyo"     %% "kyo-tapir"       % kyoVersion,
       "io.getkyo"     %% "kyo-zio"         % kyoVersion,
       "io.getkyo"     %% "kyo-zio-test"    % kyoVersion,
-      "org.jline"      % "jline"           % "3.24.1",
       "ch.qos.logback" % "logback-classic" % "1.5.14",
     ),
     run / fork        := true,
     scalafmtOnCompile := true,
   )
 
-addCommandAlias("fmt", "scalafmtAll; scalafmtSbt")
 addCommandAlias("format", "scalafmtAll; scalafmtSbt")

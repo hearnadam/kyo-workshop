@@ -70,12 +70,12 @@ object `03_Streams` extends KyoSpecDefault {
 
       // runForeach: run the Stream, applying the effect to each element
       // Use `Console.print` to print each element
-      lazy val runForeach: Unit < (Abort[java.io.IOException] & IO) = ???
+      lazy val runForeach: Unit < (Abort[java.io.IOException] & Sync) = ???
 
       assertTrue(run.eval == Chunk(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) &&
       assertTrue(runFold.eval == List(10, 9, 8, 7, 6, 5, 4, 3, 2, 1)) &&
       assertTrue(Var.runTuple(0)(runDiscard).eval == (55, ())) &&
-      assertTrue(Abort.run(IO.Unsafe.run(runForeach)).eval == Result.unit)
+      assertTrue(Abort.run(Sync.Unsafe.run(runForeach)).eval == Result.unit)
     } @@ ignore,
   )
 }

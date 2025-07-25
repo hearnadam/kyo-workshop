@@ -46,7 +46,7 @@ object `01_Composition` extends KyoSpecDefault {
           * What is the combined type? Can the test run this effect?
           */
         val aborting: Int < Abort[Throwable] = 42
-        val sideEffecting: Unit < IO         = IO(println("hello"))
+        val sideEffecting: Unit < Sync       = Sync.defer(println("hello"))
         val mutating: Int < Var[Int]         = Var.update((i: Int) => i + 42)
         val result: TestResult               = assertCompletes
 
@@ -120,12 +120,12 @@ object `01_Effects` extends KyoSpecDefault {
       },
       test("Resource") {
 
-        /** Exercise: Resource
+        /** Exercise: Scope
           *
-          * Resource is an effect that manages a resource. It can be used to manage lifetime of
+          * Scope is an effect that manages a resource. It can be used to manage lifetime of
           * resourceful values like Files.
           *
-          * Resources are acquired when Resource.run is called and released when the computation
+          * Scope is acquired when Scope.acquireRelease is called and released when the computation
           * completes. This allows for flexible control over resource lifetimes.
           */
 
@@ -133,21 +133,21 @@ object `01_Effects` extends KyoSpecDefault {
         val files = AtomicRef.Unsafe.init(Chunk.empty[File])(using AllowUnsafe.embrace.danger).safe
 
         case class File(path: String, closed: AtomicBoolean, reads: AtomicInt):
-          def read: String < (IO & Abort[IOException]) =
+          def read: String < (Sync & Abort[IOException]) =
             for
               c <- closed.get
               _ <- Abort.when(c)(new IOException("File already closed"))
               r <- reads.incrementAndGet
             yield s"$path read $r times"
-          def close: Unit < IO = IO(closed.set(true))
-          def state: (String, Boolean, Int) < IO =
+          def close: Unit < Sync = Sync.defer(closed.set(true))
+          def state: (String, Boolean, Int) < Sync =
             for
               c <- closed.get
               r <- reads.get
             yield (path, c, r)
 
         object File:
-          def open(path: String): File < IO =
+          def open(path: String): File < Sync =
             for
               closed <- AtomicBoolean.init(false)
               reads  <- AtomicInt.init
@@ -156,12 +156,12 @@ object `01_Effects` extends KyoSpecDefault {
             yield file
 
         // define a function to open a file, acquiring and releasing a resource.
-        def open(path: String): File < (IO & Resource) =
-          Resource.acquireRelease(File.open(path))(_.close)
+        def open(path: String): File < (Sync & Scope) =
+          Scope.acquireRelease(File.open(path))(_.close)
 
         // Open 2 files:
-        // `first`, open a file named 'one', then invoke 'read' wrapping full expression in `Resource.run`.
-        // `second`, open file named 'two' wrapped in `Resource.run`, then invoke 'read'
+        // `first`, open a file named 'one', then invoke 'read' wrapping full expression in `Scope.run`.
+        // `second`, open file named 'two' wrapped in `Scope.run`, then invoke 'read'
 
         lazy val one = ???
         lazy val two = ???
@@ -184,7 +184,7 @@ object `01_Effects` extends KyoSpecDefault {
           * Write a function to emit `n` numbers, doubling each number and looping until `n` is less
           * than or equal to 0.
           */
-        def emitN(n: Int): Int < (IO & Emit[Int]) = ???
+        def emitN(n: Int): Int < (Sync & Emit[Int]) = ???
 
         Emit
           .run(emitN(10))

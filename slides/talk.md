@@ -89,13 +89,13 @@ autoscale: false
 # Kyo Syntax
 
 ```scala
-val _: String < IO = IO("Hello scala.io!")
+val _: String < Sync = Sync.defer("Hello scala.io!")
 ```
 
 * Infix 'Pending' Type: `Result < Effects`
-  * `String < IO`
+  * `String < Sync`
 * Effects are represented as unordered set:
-  * `File < (IO & Resource)`'
+  * `File < (Sync & Resource)`'
 
 ---
 
@@ -228,7 +228,7 @@ val c: Result[Exception, Int] = b.eval
 ```scala
 val a: String < (Abort[Exception] & IO) =
     defer {
-        val b: String = await(IO("hello"))
+        val b: String = await(Sync.defer("hello"))
         val c: String = await(Abort.get(Right("world")))
         b + " " + c
     }

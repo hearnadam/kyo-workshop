@@ -32,9 +32,9 @@ object `02_Async` extends KyoSpecDefault {
     } @@ ignore,
     test("parallel") {
 
-      /** Exercise: Async.parallel
+      /** Exercise: Async.zip
         *
-        * Async.parallel executes computations in parallel and collects their results into a tuple.
+        * Async.zip executes computations in parallel and collects their results into a tuple.
         * If any computation fails, the error is propagated and remaining computations are
         * interrupted.
         *
@@ -101,7 +101,7 @@ object `02_Async` extends KyoSpecDefault {
         *   - Return input * 2 if positive
         *   - Fork the computation with Async.run
         */
-      def computation(i: Int): Fiber[String, Int] < IO = ???
+      def computation(i: Int): Fiber[Int, Abort[String]] < Sync = ???
 
       // `fiber#get` awaits the result, translating the `Fiber` error channel back to `Abort `
       // Note how Fiber's `E` channel is translated to/from Abort.
@@ -145,7 +145,7 @@ object `02_Structures` extends KyoSpecDefault {
             *   - Updates it by adding 1
             *   - Returns the new value
             */
-          lazy val computation: Int < IO = ???
+          lazy val computation: Int < Sync = ???
 
           computation.map(v => assertTrue(v == 1))
         } @@ ignore
@@ -165,7 +165,7 @@ object `02_Structures` extends KyoSpecDefault {
             *   - Taking an element
             *   - Verifying it's no longer full
             */
-          lazy val computation: (Boolean, Maybe[Int], Boolean) < (IO & Abort[Closed]) = ???
+          lazy val computation: (Boolean, Maybe[Int], Boolean) < (Sync & Abort[Closed]) = ???
 
           computation.map((full, first, afterPoll) =>
             assertTrue(

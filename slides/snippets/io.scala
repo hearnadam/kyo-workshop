@@ -10,7 +10,7 @@ extension (sc: StringContext)
 
 object DB:
   private val local = Local.init(())
-  def query[A](sql: SQL[A]): Chunk[A] < IO = local.get.map(_ => IO(println(s"querying $sql"))).as(Chunk.empty)
+  def query[A](sql: SQL[A]): Chunk[A] < Sync = local.get.map(_ => Sync.defer(println(s"querying $sql"))).as(Chunk.empty)
 
 object MyApp extends KyoApp:
   val x: Chunk[Person] < Any = 
