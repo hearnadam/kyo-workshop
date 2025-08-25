@@ -184,7 +184,7 @@ object `01_Effects` extends KyoSpecDefault {
           * Write a function to emit `n` numbers, doubling each number and looping until `n` is less
           * than or equal to 0.
           */
-        def emitN(n: Int): Int < (Sync & Emit[Int]) = ???
+        def emitN(n: Int): Unit < Emit[Int] = ???
 
         Emit
           .run(emitN(10))
