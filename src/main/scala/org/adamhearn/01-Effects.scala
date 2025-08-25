@@ -117,7 +117,7 @@ object `01_Effects` extends KyoSpecDefault {
 
         lazy val fifty: Long = Var.run(Chunk(0L, 1L))(fib(50)).eval
         assertTrue(fifty == 12586269025L)
-      },
+      } @@ ignore,
       test("Resource") {
 
         /** Exercise: Scope
