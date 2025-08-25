@@ -86,9 +86,9 @@ object `02_Async` extends KyoSpecDefault {
     } @@ ignore,
     test("run") {
 
-      /** Exercise: Async.run
+      /** Exercise: Fiber.init
         *
-        * Async.run forks a computation on a separate fiber, allowing for concurrent execution. The
+        * Fiber.init forks a computation on a separate fiber, allowing for concurrent execution. The
         * returned Fiber can be used to monitor or control the computation.
         *
         * Note: Fiber[E, A] is parameterized by error type E and success type A. The E type
