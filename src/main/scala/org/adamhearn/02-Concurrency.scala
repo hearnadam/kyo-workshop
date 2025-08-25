@@ -119,10 +119,10 @@ object `02_Async` extends KyoSpecDefault {
         *
         * Complete the program to:
         *   - Start a fiber that delays for 100ms returning 42
-        *   - Interrupt it immediatelly
+        *   - Interrupt it immediately
         *   - Return the result via fiber.get
         */
-      lazy val computation: Int < Async = ???
+      lazy val computation: Int < (Async & Abort[Any]) = ???
 
       Abort.run(computation).map(result => assertTrue(result.isPanic))
     } @@ ignore,
